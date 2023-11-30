@@ -1,3 +1,26 @@
-# setup
+# Import pyomo libraries
 import pyomo.environ as pe
 import pyomo.gdp as pyogdp
+
+
+# Define Model
+model = pe.ConcreteModel()
+
+# Import cases and sessions data into pyomo model
+
+# List of case IDs in surgical waiting list
+model.CASES = pe.Set(initialize=self.df_cases["CaseID"].tolist())
+# List of sessions IDs
+model.SESSIONS = pe.Set(initialize=self.df_sessions["SessionID"].tolist())
+# List of job shop tasks - all possible combinations of cases and sessions (caseID, sessionID)
+model.TASKS = pe.Set(initialize=model.CASES * model.SESSIONS, dimen=2)
+# The duration (expected case time) for each operation
+model.CASE_DURATION = pe.Param(model.CASES, initialize=self._generate_case_durations())
+# The duration of each theatre session
+model.SESSION_DURATION = pe.Param(model.SESSIONS, initialize=self._generate_session_durations())
+# The start time of each theatre session
+model.SESSION_START_TIME = pe.Param(model.SESSIONS, initialize=self._generate_session_start_times())
+# The deadline of each case
+model.CASE_DEADLINES = pe.Param(model.CASES, initialize=self._get_ordinal_case_deadlines())
+# The date of each theatre session
+model.SESSION_DATES = pe.Param(model.SESSIONS, initialize=self._get_ordinal_session_dates())
